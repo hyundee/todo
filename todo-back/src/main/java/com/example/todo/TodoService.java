@@ -6,20 +6,24 @@ import java.util.List;
 
 @Service
 public class TodoService {
-    private final TodoRepository todoRepository;
+    private final TodoMapper todoMapper;
 
-    public TodoService(TodoRepository todoRepository) {
-        this.todoRepository = todoRepository;
+    public TodoService(TodoMapper todoMapper) {
+        this.todoMapper = todoMapper;
     }
 
     //전체 조회
     public List<Todo> getTodos() {
-        return todoRepository.findAll();
+        return todoMapper.findAll();
     }
 
     //단건 조회
     public Todo getTodo(Long id) {
-        return todoRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 업무를 찾을 수 없습니다."));
+        Todo todo = todoMapper.findById(id);
+        if(todo == null) {
+            throw new RuntimeException("해당 업무를 찾을 수 없습니다.");
+        }
+        return todo;
     }
 
     //추가
@@ -27,16 +31,18 @@ public class TodoService {
         if(todo.getTitle() == null || todo.getTitle().isEmpty()) {
             throw new IllegalArgumentException("제목을 입력해주세요.");
         }
-        return todoRepository.save(todo);
+        todoMapper.insert(todo);
+        return todo;
     }
 
     //수정
     public Todo updateTodo(Todo todo) {
-        return todoRepository.save(todo);
+        todoMapper.update(todo);
+        return todo;
     }
 
     //삭제
     public void deleteTodo(Long id) {
-        todoRepository.deleteById(id);
+        todoMapper.deleteById(id);
     }
 }

@@ -6,20 +6,22 @@ import java.util.List;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService(UserMapper userMapper) {
+        this.userMapper = userMapper;
     }
 
     //전체 조회
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return userMapper.findAll();
     }
 
     //단일 조회
     public User getUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
+        User user = userMapper.findById(id);
+        if(user == null) throw new RuntimeException("해당 유저를 찾을 수 없습니다.");
+        return user;
     }
 
     //추가
@@ -27,16 +29,18 @@ public class UserService {
         if(user.getName() == null || user.getName().isEmpty()){
             throw new IllegalArgumentException("유저 이름을 입력해주세요");
         }
-        return userRepository.save(user);
+        userMapper.insert(user);
+        return user;
     }
 
     //수정
     public User updateUser(User user) {
-        return userRepository.save(user);
+        userMapper.update(user);
+        return user;
     }
 
     //삭제
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        userMapper.deleteById(id);
     }
 }
